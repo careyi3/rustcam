@@ -1,0 +1,16 @@
+[package]
+name = "rustcam"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "rustcam"
+path = "src/lib/lib.rs"
+
+[[bin]]
+name = "contour_plot"
+path = "src/contour_plots/main.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
