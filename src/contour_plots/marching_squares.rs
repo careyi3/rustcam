@@ -1,4 +1,4 @@
-use crate::types::{build_stroke, Stroke};
+use crate::types::Stroke;
 use std::collections::HashMap;
 
 const STROKE_OFFSETS: &'static [[[f32; 4]; 2]; 16] = &[
@@ -23,13 +23,14 @@ const STROKE_OFFSETS: &'static [[[f32; 4]; 2]; 16] = &[
 pub fn generate(
     by_height: HashMap<i32, Vec<String>>,
     points: HashMap<String, i32>,
-) -> HashMap<String, Stroke> {
-    let mut strokes: HashMap<String, Stroke> = Default::default();
+) -> HashMap<i32, Vec<Stroke>> {
+    let mut stroke_hash: HashMap<i32, Vec<Stroke>> = Default::default();
     let keys: Vec<&i32> = by_height.keys().collect();
     let max = **keys.iter().max().unwrap();
     let min = **keys.iter().min().unwrap();
 
     for n in min + 1..max + 1 {
+        let mut strokes: HashMap<String, Stroke> = Default::default();
         if by_height.contains_key(&n) {
             for coord in by_height[&n].iter() {
                 let v: Vec<i32> = coord.split(":").map(|val| val.parse().unwrap()).collect();
@@ -67,9 +68,10 @@ pub fn generate(
                 }
             }
         }
+        stroke_hash.insert(n, strokes.into_values().collect());
     }
 
-    return strokes;
+    return stroke_hash;
 }
 
 fn get_point_value(height: i32, x: i32, y: i32, points: &HashMap<String, i32>) -> usize {
@@ -88,7 +90,7 @@ fn get_strokes(case: usize, x: f32, y: f32) -> Vec<Stroke> {
         if stroke_offset[0] == -1.0 {
             break;
         }
-        data.push(build_stroke(
+        data.push(Stroke::build_stroke(
             x + stroke_offset[0],
             y + stroke_offset[1],
             x + stroke_offset[2],
