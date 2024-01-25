@@ -23,16 +23,23 @@ const STROKE_OFFSETS: &'static [[[f32; 4]; 2]; 16] = &[
 pub fn generate(
     by_height: HashMap<i32, Vec<String>>,
     points: HashMap<String, i32>,
+    step: usize,
+    min: i32,
 ) -> HashMap<i32, Vec<Stroke>> {
     let mut stroke_hash: HashMap<i32, Vec<Stroke>> = Default::default();
     let keys: Vec<&i32> = by_height.keys().collect();
     let max = **keys.iter().max().unwrap();
-    let min = **keys.iter().min().unwrap();
 
-    for n in min + 1..max + 1 {
+    for n in (min + 1..max + 1).step_by(step) {
+        // TODO: Deal with remainders from step_by
         let mut strokes: HashMap<String, Stroke> = Default::default();
         if by_height.contains_key(&n) {
-            for coord in by_height[&n].iter() {
+            let heights: Vec<&i32> = by_height.keys().filter(|x| *x >= &n).collect();
+            let mut coord_list: Vec<String> = vec![];
+            for height in heights {
+                coord_list.append(&mut by_height[height].clone());
+            }
+            for coord in coord_list {
                 let v: Vec<i32> = coord.split(":").map(|val| val.parse().unwrap()).collect();
                 let (x, y) = (v[0], v[1]);
                 let coords = [

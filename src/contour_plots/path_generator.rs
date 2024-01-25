@@ -14,58 +14,57 @@ pub fn generate_paths(stroke_hash: HashMap<i32, Vec<Stroke>>) -> Vec<Path> {
     }
 
     let mut final_paths: Vec<Path> = vec![];
-    for inner_paths in paths {
-        let mut paths_to_check = inner_paths.clone();
+    for mut inner_paths in paths {
         let mut unmatched_count: usize = 0;
-        let mut paths_count = paths_to_check.as_slice().len();
-        while unmatched_count < paths_count {
-            let current_path = paths_to_check.pop().unwrap();
+        let mut paths_count: usize = inner_paths.as_slice().len();
+        while unmatched_count < paths_count && paths_count > 0 {
+            let current_path = inner_paths.pop().unwrap();
             let mut paths: Vec<Path> = vec![];
 
             let mut matched = false;
-            for path in paths_to_check {
-                if path.end == current_path.start && !matched {
-                    paths =
-                        insert_new_path(paths, path.strokes.clone(), current_path.strokes.clone());
-                    matched = true;
-                    continue;
-                }
-                if path.start == current_path.end && !matched {
-                    paths =
-                        insert_new_path(paths, current_path.strokes.clone(), path.strokes.clone());
-                    matched = true;
-                    continue;
-                }
-                if path.start == current_path.start && !matched {
-                    paths = insert_new_path(
-                        paths,
-                        reverse_strokes(path.strokes.clone()),
-                        current_path.strokes.clone(),
-                    );
-                    matched = true;
-                    continue;
-                }
-                if path.end == current_path.end && !matched {
-                    paths = insert_new_path(
-                        paths,
-                        path.strokes.clone(),
-                        reverse_strokes(current_path.strokes.clone()),
-                    );
-                    matched = true;
-                    continue;
+            for path in inner_paths {
+                if !matched {
+                    if path.end == current_path.start {
+                        paths = insert_new_path(paths, path.strokes, current_path.strokes.clone());
+                        matched = true;
+                        continue;
+                    }
+                    if path.start == current_path.end {
+                        paths = insert_new_path(paths, current_path.strokes.clone(), path.strokes);
+                        matched = true;
+                        continue;
+                    }
+                    if path.start == current_path.start {
+                        paths = insert_new_path(
+                            paths,
+                            reverse_strokes(path.strokes),
+                            current_path.strokes.clone(),
+                        );
+                        matched = true;
+                        continue;
+                    }
+                    if path.end == current_path.end {
+                        paths = insert_new_path(
+                            paths,
+                            path.strokes,
+                            reverse_strokes(current_path.strokes.clone()),
+                        );
+                        matched = true;
+                        continue;
+                    }
                 }
                 paths.push(path);
             }
             if matched {
                 unmatched_count = 0;
             } else {
-                paths.push(current_path.clone());
+                paths.push(current_path);
                 unmatched_count += 1;
             }
-            paths_to_check = paths.clone();
-            paths_count = paths_to_check.as_slice().len();
+            inner_paths = paths;
+            paths_count = inner_paths.as_slice().len();
         }
-        final_paths.append(&mut paths_to_check);
+        final_paths.append(&mut inner_paths);
     }
 
     return final_paths;
@@ -73,13 +72,11 @@ pub fn generate_paths(stroke_hash: HashMap<i32, Vec<Stroke>>) -> Vec<Path> {
 
 fn insert_new_path(
     mut paths: Vec<Path>,
-    strokes: Vec<Stroke>,
-    strokes_to_append: Vec<Stroke>,
+    mut strokes: Vec<Stroke>,
+    mut strokes_to_append: Vec<Stroke>,
 ) -> Vec<Path> {
-    let mut strokes_copy = strokes.clone();
-    let mut strokes_to_append_copy = strokes_to_append.clone();
-    strokes_copy.append(&mut strokes_to_append_copy);
-    let new_path = Path::build_path_from_strokes(strokes_copy);
+    strokes.append(&mut strokes_to_append);
+    let new_path = Path::build_path_from_strokes(strokes);
     paths.insert(0, new_path);
     return paths;
 }

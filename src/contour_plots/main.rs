@@ -7,7 +7,7 @@ fn main() {
     let data = file_parser::read("./data/test2");
     let (by_height, points) = file_parser::parse(data);
 
-    let strokes_hash = marching_squares::generate(by_height, points);
+    let strokes_hash = marching_squares::generate(by_height, points, 1, 1);
 
     let paths = path_generator::generate_paths(strokes_hash);
 
