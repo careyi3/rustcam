@@ -1,10 +1,17 @@
+use log::error;
 use std::{collections::HashMap, fs};
 
 pub fn read(path: &str) -> Vec<Vec<i32>> {
-    let contents: String =
-        fs::read_to_string(path).expect("Should have been able to read the file");
+    let contents_result = fs::read_to_string(path);
+    if contents_result.is_err() {
+        error!("Could not read file: {}", path);
+    }
 
-    let lines: Vec<String> = contents.split("\n").map(|x| x.to_string()).collect();
+    let lines: Vec<String> = contents_result
+        .unwrap()
+        .split("\n")
+        .map(|x| x.to_string())
+        .collect();
 
     let mut data: Vec<Vec<i32>> = vec![];
 

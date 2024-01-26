@@ -1,4 +1,5 @@
 use crate::types::Stroke;
+use log::info;
 use std::collections::HashMap;
 
 const STROKE_OFFSETS: &'static [[[f32; 4]; 2]; 16] = &[
@@ -30,8 +31,8 @@ pub fn generate(
     let keys: Vec<&i32> = by_height.keys().collect();
     let max = **keys.iter().max().unwrap();
 
-    for n in (min + 1..max + 1).step_by(step) {
-        // TODO: Deal with remainders from step_by
+    for n in (min..max + 1).step_by(step).rev() {
+        // Figure out a way to deal with remainder in the step better
         let mut strokes: HashMap<String, Stroke> = Default::default();
         if by_height.contains_key(&n) {
             let heights: Vec<&i32> = by_height.keys().filter(|x| *x >= &n).collect();
@@ -76,6 +77,7 @@ pub fn generate(
             }
         }
         stroke_hash.insert(n, strokes.into_values().collect());
+        info!("{}/{}", n, max);
     }
 
     return stroke_hash;

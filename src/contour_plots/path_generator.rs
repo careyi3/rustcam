@@ -1,4 +1,5 @@
 use crate::types::{Path, Stroke};
+use log::info;
 use std::collections::HashMap;
 
 pub fn generate_paths(stroke_hash: HashMap<i32, Vec<Stroke>>) -> Vec<Path> {
@@ -13,6 +14,8 @@ pub fn generate_paths(stroke_hash: HashMap<i32, Vec<Stroke>>) -> Vec<Path> {
         paths.push(inner_paths);
     }
 
+    let total_paths = paths.as_slice().len();
+    let mut path_num = 0;
     let mut final_paths: Vec<Path> = vec![];
     for mut inner_paths in paths {
         let mut unmatched_count: usize = 0;
@@ -65,6 +68,8 @@ pub fn generate_paths(stroke_hash: HashMap<i32, Vec<Stroke>>) -> Vec<Path> {
             paths_count = inner_paths.as_slice().len();
         }
         final_paths.append(&mut inner_paths);
+        info!("{}/{}", path_num, total_paths - 1);
+        path_num += 1;
     }
 
     return final_paths;
