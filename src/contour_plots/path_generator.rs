@@ -5,6 +5,7 @@ use std::collections::HashMap;
 pub fn generate_paths(stroke_hash: HashMap<i32, Vec<Stroke>>) -> Vec<Path> {
     let mut paths: Vec<Vec<Path>> = Default::default();
 
+    let path_group_count = stroke_hash.keys().count();
     for (_, strokes) in stroke_hash {
         let mut inner_paths: Vec<Path> = Default::default();
         for stroke in strokes {
@@ -14,8 +15,7 @@ pub fn generate_paths(stroke_hash: HashMap<i32, Vec<Stroke>>) -> Vec<Path> {
         paths.push(inner_paths);
     }
 
-    let total_paths = paths.as_slice().len();
-    let mut path_num = 0;
+    let mut path_num = 1;
     let mut final_paths: Vec<Path> = vec![];
     for mut inner_paths in paths {
         let mut unmatched_count: usize = 0;
@@ -68,7 +68,7 @@ pub fn generate_paths(stroke_hash: HashMap<i32, Vec<Stroke>>) -> Vec<Path> {
             paths_count = inner_paths.as_slice().len();
         }
         final_paths.append(&mut inner_paths);
-        info!("{}/{}", path_num, total_paths - 1);
+        info!("{}/{}", path_num, path_group_count);
         path_num += 1;
     }
 

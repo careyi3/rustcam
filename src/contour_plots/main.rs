@@ -5,6 +5,7 @@ use std::time::Instant;
 
 mod file_parser;
 mod file_writer;
+mod gcode_generator;
 mod marching_squares;
 mod path_generator;
 mod types;
@@ -29,32 +30,7 @@ fn main() {
         let paths = path_generator::generate_paths(strokes_hash);
         info!("Num paths: {}", paths.as_slice().len());
 
-        let mut commands: Vec<String> = vec![];
-        commands.push("G90 G94".to_string());
-        commands.push("G17".to_string());
-        commands.push("G21".to_string());
-        commands.push("G28 G91 Z0".to_string());
-        commands.push("G90".to_string());
-        commands.push("S5000 M3".to_string());
-        for path in paths {
-            let start = path.start;
-            commands.push("G0 F400".to_string());
-            commands.push("Z1".to_string());
-            commands.push(format!("X{} Y{}", start.x, start.y));
-            commands.push("Z-0.4".to_string());
-            commands.push("G1 F200".to_string());
-            for stroke in path.strokes {
-                commands.push(format!("X{} Y{}", stroke.end.x, stroke.end.y));
-            }
-        }
-        commands.push("G0 F400".to_string());
-        commands.push("Z2".to_string());
-        commands.push("G28 G91 Z0".to_string());
-        commands.push("G90".to_string());
-        commands.push("G28 G91 X0 Y0".to_string());
-        commands.push("G90".to_string());
-        commands.push("M5".to_string());
-        commands.push("M30".to_string());
+        let commands = gcode_generator::generate_commands(paths);
 
         file_writer::write_file(output_prefix + ".nc", commands);
     }

@@ -1,7 +1,7 @@
 #[derive(Copy, Clone, PartialEq)]
 pub struct Point {
-    pub x: f32,
-    pub y: f32,
+    pub x: i32,
+    pub y: i32,
 }
 
 #[derive(Copy, Clone)]
@@ -18,7 +18,7 @@ impl Stroke {
         );
     }
 
-    pub fn build_stroke(start_x: f32, start_y: f32, end_x: f32, end_y: f32) -> Stroke {
+    pub fn build_stroke(start_x: i32, start_y: i32, end_x: i32, end_y: i32) -> Stroke {
         let start = Point {
             x: start_x,
             y: start_y,
