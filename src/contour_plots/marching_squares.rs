@@ -37,7 +37,7 @@ pub fn generate(
         let offset = n + step as i32;
         let heights_ref: Vec<&i32> = by_height
             .keys()
-            .filter(|x| *x > &n && *x < &offset)
+            .filter(|x| *x >= &n && *x < &offset)
             .collect();
         let mut heights: Vec<i32> = vec![];
         for h in heights_ref {
