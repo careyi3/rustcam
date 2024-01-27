@@ -1,10 +1,10 @@
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub struct Point {
     pub x: i32,
     pub y: i32,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub struct Stroke {
     pub start: Point,
     pub end: Point,
@@ -29,7 +29,7 @@ impl Stroke {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub struct Path {
     pub start: Point,
     pub end: Point,

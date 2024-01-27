@@ -32,12 +32,20 @@ pub fn generate(
     let max = **keys.iter().max().unwrap();
     let mut visited: HashMap<String, i32> = Default::default();
 
-    for n in (min..max - 1).step_by(step) {
-        // Figure out a way to deal with remainder in the step better
+    for n in (min..max - 1).step_by(step).rev() {
         let mut strokes: HashMap<String, Stroke> = Default::default();
-        let heights: Vec<&i32> = by_height.keys().filter(|x| *x >= &n).collect();
+        let offset = n + step as i32;
+        let heights_ref: Vec<&i32> = by_height
+            .keys()
+            .filter(|x| *x > &n && *x < &offset)
+            .collect();
+        let mut heights: Vec<i32> = vec![];
+        for h in heights_ref {
+            heights.push(*h);
+        }
+        heights.sort();
         let mut coord_list: Vec<String> = vec![];
-        for height in heights {
+        for height in &heights {
             coord_list.append(&mut by_height[height].clone());
         }
         for coord in coord_list {

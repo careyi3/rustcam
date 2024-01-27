@@ -39,10 +39,10 @@ fn main() {
 }
 
 fn parse_args(args: Vec<String>) -> (usize, i32, String, String) {
-    let mut step = 1;
-    let mut min = 1;
-    let mut input = "test".to_string();
-    let mut output_prefix = "test".to_string();
+    let mut step = 35;
+    let mut min = 400;
+    let mut input = "./data/croughan".to_string();
+    let mut output_prefix = "./data/croughan".to_string();
 
     if args.get(1) != None {
         let step_arg = args[1].parse::<usize>();
