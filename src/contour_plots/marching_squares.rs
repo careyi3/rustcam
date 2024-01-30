@@ -32,12 +32,17 @@ pub fn generate(
     let max = **keys.iter().max().unwrap();
     let mut visited: HashMap<String, i32> = Default::default();
 
-    for n in (min..max - 1).step_by(step).rev() {
+    let mut heights_to_check: Vec<i32> = (min..max - 1).step_by(step).collect();
+    if (max - 1) % step as i32 != 0 || step == 1 {
+        heights_to_check.push(max - 1);
+    }
+
+    for n in heights_to_check.iter() {
         let mut strokes: HashMap<String, Stroke> = Default::default();
-        let offset = n + step as i32;
+        let height_offset = n + step as i32;
         let heights_ref: Vec<&i32> = by_height
             .keys()
-            .filter(|x| *x >= &n && *x < &offset)
+            .filter(|x| *x >= &n && *x < &height_offset)
             .collect();
         let mut heights: Vec<i32> = vec![];
         for h in heights_ref {
@@ -48,6 +53,7 @@ pub fn generate(
         for height in &heights {
             coord_list.append(&mut by_height[height].clone());
         }
+        coord_list.sort();
         for coord in coord_list {
             let v: Vec<i32> = coord.split(":").map(|val| val.parse().unwrap()).collect();
             let (x, y) = (v[0], v[1]);
@@ -66,10 +72,10 @@ pub fn generate(
             for coord in coords {
                 let (x, y) = (coord.0, coord.1);
                 let case: usize = [
-                    get_point_value(n, x, y, &points),
-                    get_point_value(n, x + 1, y, &points),
-                    get_point_value(n, x + 1, y + 1, &points),
-                    get_point_value(n, x, y + 1, &points),
+                    get_point_value(*n, x, y, &points),
+                    get_point_value(*n, x + 1, y, &points),
+                    get_point_value(*n, x + 1, y + 1, &points),
+                    get_point_value(*n, x, y + 1, &points),
                 ]
                 .into_iter()
                 .fold(0, |acc, digit| (acc << 1) + digit);
@@ -89,7 +95,7 @@ pub fn generate(
                 }
             }
         }
-        stroke_hash.insert(n, strokes.into_values().collect());
+        stroke_hash.insert(*n, strokes.into_values().collect());
         info!("{}/{}", n, max - 1);
     }
 

@@ -1,5 +1,7 @@
 use crate::types::{Path, Stroke};
 use log::info;
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 use std::collections::HashMap;
 
 pub fn generate_paths(stroke_hash: HashMap<i32, Vec<Stroke>>) -> Vec<Path> {
@@ -16,6 +18,7 @@ pub fn generate_paths(stroke_hash: HashMap<i32, Vec<Stroke>>) -> Vec<Path> {
             let path = Path::build_path_from_stroke(*stroke);
             inner_paths.push(path);
         }
+        inner_paths.sort();
         paths.push(inner_paths);
     }
 
@@ -24,27 +27,34 @@ pub fn generate_paths(stroke_hash: HashMap<i32, Vec<Stroke>>) -> Vec<Path> {
     for mut inner_paths in paths {
         let mut unmatched_count: usize = 0;
         let mut paths_count: usize = inner_paths.as_slice().len();
-        while unmatched_count < paths_count && paths_count > 0 {
+        while unmatched_count < paths_count * 2 && paths_count > 0 {
             let current_path = inner_paths.pop().unwrap();
             let mut paths: Vec<Path> = vec![];
-
             let mut matched = false;
             for path in inner_paths {
                 if !matched {
                     if path.end == current_path.start {
-                        paths = insert_new_path(paths, path.strokes, current_path.strokes.clone());
+                        paths = insert_new_path(
+                            paths,
+                            path.strokes.clone(),
+                            current_path.strokes.clone(),
+                        );
                         matched = true;
                         continue;
                     }
                     if path.start == current_path.end {
-                        paths = insert_new_path(paths, current_path.strokes.clone(), path.strokes);
+                        paths = insert_new_path(
+                            paths,
+                            current_path.strokes.clone(),
+                            path.strokes.clone(),
+                        );
                         matched = true;
                         continue;
                     }
                     if path.start == current_path.start {
                         paths = insert_new_path(
                             paths,
-                            reverse_strokes(path.strokes),
+                            reverse_strokes(path.strokes.clone()),
                             current_path.strokes.clone(),
                         );
                         matched = true;
@@ -53,26 +63,28 @@ pub fn generate_paths(stroke_hash: HashMap<i32, Vec<Stroke>>) -> Vec<Path> {
                     if path.end == current_path.end {
                         paths = insert_new_path(
                             paths,
-                            path.strokes,
+                            path.strokes.clone(),
                             reverse_strokes(current_path.strokes.clone()),
                         );
                         matched = true;
                         continue;
                     }
                 }
-                paths.push(path);
+                paths.insert(0, path);
             }
             if matched {
                 unmatched_count = 0;
             } else {
-                paths.push(current_path);
+                paths.insert(0, current_path);
                 unmatched_count += 1;
             }
+            paths.shuffle(&mut thread_rng());
             inner_paths = paths;
             paths_count = inner_paths.as_slice().len();
         }
+        let paths_len = inner_paths.as_slice().len();
         final_paths.append(&mut inner_paths);
-        info!("{}/{}", path_num, path_group_count);
+        info!("{}/{} - {}", path_num, path_group_count, paths_len);
         path_num += 1;
     }
 
