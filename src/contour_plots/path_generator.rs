@@ -1,7 +1,5 @@
 use crate::types::{Path, Stroke};
 use log::info;
-use rand::seq::SliceRandom;
-use rand::thread_rng;
 use std::collections::HashMap;
 
 pub fn generate_paths(stroke_hash: HashMap<i32, Vec<Stroke>>) -> Vec<Path> {
@@ -25,6 +23,7 @@ pub fn generate_paths(stroke_hash: HashMap<i32, Vec<Stroke>>) -> Vec<Path> {
     let mut path_num = 1;
     let mut final_paths: Vec<Path> = vec![];
     for mut inner_paths in paths {
+        let mut paths_found = 0;
         let mut paths_count: usize = inner_paths.as_slice().len();
         if paths_count > 0 {
             let mut current_path = inner_paths.pop().unwrap();
@@ -65,6 +64,7 @@ pub fn generate_paths(stroke_hash: HashMap<i32, Vec<Stroke>>) -> Vec<Path> {
                     new_inner_paths.push(path);
                 }
                 if !matched {
+                    paths_found += 1;
                     final_paths.push(current_path.clone());
                     if new_inner_paths.as_slice().len() > 0 {
                         current_path = new_inner_paths.pop().unwrap();
@@ -73,10 +73,11 @@ pub fn generate_paths(stroke_hash: HashMap<i32, Vec<Stroke>>) -> Vec<Path> {
                 inner_paths = new_inner_paths;
                 paths_count = inner_paths.as_slice().len();
             }
+            paths_found += 1;
             final_paths.push(current_path);
         }
 
-        info!("{}/{}", path_num, path_group_count);
+        info!("{}/{} - {}", path_num, path_group_count, paths_found);
         path_num += 1;
     }
 
