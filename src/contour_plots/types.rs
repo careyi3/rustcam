@@ -27,6 +27,14 @@ impl Stroke {
 
         return Stroke { start, end };
     }
+
+    pub fn midpoint(stroke: &Stroke) -> Point {
+        let point = Point {
+            x: (stroke.end.x - stroke.start.x) / 2,
+            y: (stroke.end.y - stroke.start.y) / 2,
+        };
+        return point;
+    }
 }
 
 #[derive(Clone, PartialEq, PartialOrd, Eq, Ord)]
