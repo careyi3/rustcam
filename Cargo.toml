@@ -8,11 +8,15 @@ opt-level = 3
 
 [lib]
 name = "rustcam"
-path = "src/lib/lib.rs"
+path = "src/lib/rustcam.rs"
 
 [[bin]]
 name = "contour_plot"
 path = "src/contour_plots/main.rs"
+
+[[bin]]
+name = "spotify_codes"
+path = "src/spotify_codes/main.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

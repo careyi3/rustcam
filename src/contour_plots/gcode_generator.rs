@@ -1,32 +1,32 @@
 use crate::types::Path;
+use rustcam;
+use rustcam::types::{Point, ToolPath};
 
-// TODO: Abstract this all out to generic library.
 pub fn generate_commands(paths: Vec<Path>) -> Vec<String> {
-    let mut commands: Vec<String> = vec![];
-    commands.push("G90 G94".to_string());
-    commands.push("G17".to_string());
-    commands.push("G21".to_string());
-    commands.push("G28 G91 Z0".to_string());
-    commands.push("G90".to_string());
-    commands.push("S5000 M3".to_string());
+    let mut toolpaths: Vec<ToolPath> = vec![];
     for path in paths {
-        let start = path.start;
-        commands.push("G0 F400".to_string());
-        commands.push("Z1".to_string());
-        commands.push(format!("X{} Y{}", start.x, start.y));
-        commands.push("Z-0.4".to_string());
-        commands.push("G1 F200".to_string());
+        let mut toolpath = ToolPath {
+            start: Point {
+                x: path.start.x,
+                y: path.start.y,
+            },
+            end: Point {
+                x: path.end.x,
+                y: path.end.y,
+            },
+            points: vec![],
+        };
         for stroke in path.strokes {
-            commands.push(format!("X{} Y{}", stroke.end.x, stroke.end.y));
+            toolpath.points.push(Point {
+                x: stroke.start.x,
+                y: stroke.start.y,
+            });
+            toolpath.points.push(Point {
+                x: stroke.end.x,
+                y: stroke.end.y,
+            });
         }
+        toolpaths.push(toolpath);
     }
-    commands.push("G0 F400".to_string());
-    commands.push("Z2".to_string());
-    commands.push("G28 G91 Z0".to_string());
-    commands.push("G90".to_string());
-    commands.push("G28 G91 X0 Y0".to_string());
-    commands.push("G90".to_string());
-    commands.push("M5".to_string());
-    commands.push("M30".to_string());
-    return commands;
+    return rustcam::generate_gcode(toolpaths);
 }
