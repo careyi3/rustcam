@@ -2,11 +2,11 @@ use env_logger::{Builder, Env, Target};
 use log::info;
 use rustcam;
 use rustcam::file_writer;
-use rustcam::types::Point;
 use std::env;
 use std::time::Instant;
 
 mod gcode_generator;
+mod svg_parser;
 
 fn main() {
     init_logging();
@@ -14,11 +14,11 @@ fn main() {
     {
         let args: Vec<String> = env::args().collect();
 
-        let (_, output) = parse_args(args);
+        let (input, output) = parse_args(args);
 
-        let points: Vec<Point> = vec![Point { x: 0.0, y: 0.0 }];
+        let values = svg_parser::parse(input);
 
-        let commands = gcode_generator::generate_commands(points);
+        let commands = gcode_generator::generate_commands(values);
 
         file_writer::write_file(output + ".nc", commands);
     }

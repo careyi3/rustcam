@@ -1,36 +1,37 @@
 use rustcam;
-use rustcam::types::{Arc, Point, ToolPath};
+use rustcam::types::{Arc, Line, Point, ToolPath};
 
-pub fn generate_commands(points: Vec<Point>) -> Vec<String> {
+pub fn generate_commands(values: Vec<(String, String, String)>) -> Vec<String> {
     let mut toolpaths: Vec<ToolPath> = vec![];
-    let mut toolpath = ToolPath {
-        start: Point {
-            x: points.first().unwrap().x,
-            y: points.first().unwrap().y,
-        },
-        end: Point {
-            x: points.first().unwrap().x,
-            y: points.first().unwrap().y,
-        },
-        segments: vec![],
+
+    let circle_point = Point { x: 40.0, y: 50.0 };
+    let arc = Arc {
+        start: circle_point,
+        end: circle_point,
+        radius: 20.0,
+        direction: true,
     };
-    for point in points {
-        let start = Point {
-            x: point.x,
-            y: point.y,
-        };
-        let end = Point {
-            x: point.x,
-            y: point.y,
-        };
-        let arc = Arc {
+    let arc_toolpath = ToolPath {
+        start: circle_point,
+        end: circle_point,
+        segments: vec![Box::new(arc)],
+    };
+    toolpaths.push(arc_toolpath);
+
+    for idx in 1..values.len() - 1 {
+        let height = values[idx].0.parse::<f32>().unwrap();
+        let x = values[idx].1.parse::<f32>().unwrap();
+        let y = values[idx].2.parse::<f32>().unwrap();
+        let start = Point { x, y };
+        let end = Point { x, y: y + height };
+        let line = Line { start, end };
+        let mut toolpath = ToolPath {
             start,
             end,
-            radius: 1.2,
-            direction: true,
+            segments: vec![],
         };
-        toolpath.segments.push(Box::new(arc));
+        toolpath.segments.push(Box::new(line));
+        toolpaths.push(toolpath);
     }
-    toolpaths.push(toolpath);
     return rustcam::generate_gcode(toolpaths);
 }

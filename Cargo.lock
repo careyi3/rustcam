@@ -201,7 +201,14 @@ dependencies = [
  "env_logger",
  "log",
  "rand",
+ "svg",
 ]
+
+[[package]]
+name = "svg"
+version = "0.15.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "683eed9bd9a2b078f92f87d166db38292e8114ab16d4cf23787ad4eecd1bb6e5"
 
 [[package]]
 name = "utf8parse"
