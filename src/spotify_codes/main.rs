@@ -16,7 +16,7 @@ fn main() {
 
         let (_, output) = parse_args(args);
 
-        let points: Vec<Point> = vec![Point { x: 0, y: 0 }];
+        let points: Vec<Point> = vec![Point { x: 0.0, y: 0.0 }];
 
         let commands = gcode_generator::generate_commands(points);
 

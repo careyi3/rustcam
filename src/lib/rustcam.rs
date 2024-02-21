@@ -18,8 +18,9 @@ pub fn generate_gcode(toolpaths: Vec<ToolPath>) -> Vec<String> {
         commands.push(format!("X{} Y{}", start.x, start.y));
         commands.push("Z-0.4".to_string());
         commands.push("G1 F200".to_string());
-        for point in path.points {
-            commands.push(format!("X{} Y{}", point.x, point.y));
+        for segment in path.segments {
+            let g_code = segment.generate_gcode();
+            commands.push(g_code);
         }
     }
     commands.push("G0 F400".to_string());

@@ -27,6 +27,34 @@ pub struct Point {
 }
 ```
 
+#### Segment
+
+```rust
+pub trait Segment {
+    fn generate_gcode(&self) -> String;
+}
+```
+
+#### Line
+
+```rust
+pub struct Line {
+    pub start: Point,
+    pub end: Point,
+}
+```
+
+#### Arc
+
+```rust
+pub struct Arc {
+    pub start: Point,
+    pub end: Point,
+    pub radius: f32,
+    pub direction: bool,
+}
+```
+
 #### ToolPath
 
 ```rust

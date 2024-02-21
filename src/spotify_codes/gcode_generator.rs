@@ -1,5 +1,5 @@
 use rustcam;
-use rustcam::types::{Point, ToolPath};
+use rustcam::types::{Arc, Point, ToolPath};
 
 pub fn generate_commands(points: Vec<Point>) -> Vec<String> {
     let mut toolpaths: Vec<ToolPath> = vec![];
@@ -12,13 +12,24 @@ pub fn generate_commands(points: Vec<Point>) -> Vec<String> {
             x: points.first().unwrap().x,
             y: points.first().unwrap().y,
         },
-        points: vec![],
+        segments: vec![],
     };
     for point in points {
-        toolpath.points.push(Point {
+        let start = Point {
             x: point.x,
             y: point.y,
-        });
+        };
+        let end = Point {
+            x: point.x,
+            y: point.y,
+        };
+        let arc = Arc {
+            start,
+            end,
+            radius: 1.2,
+            direction: true,
+        };
+        toolpath.segments.push(Box::new(arc));
     }
     toolpaths.push(toolpath);
     return rustcam::generate_gcode(toolpaths);
