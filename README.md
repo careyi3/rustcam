@@ -20,6 +20,8 @@ This is the main library code of RustCAM. Currently it uses some hard coded defa
 
 #### Point
 
+A point on the X-Y plane. All points in this system are assumed to be at the same Z height.
+
 ```rust
 pub struct Point {
     pub x: i32,
@@ -29,6 +31,8 @@ pub struct Point {
 
 #### Segment
 
+A segment wraps the behaviour that differing kinds of movemenets within a toolpath generate different g-code.
+
 ```rust
 pub trait Segment {
     fn generate_gcode(&self) -> String;
@@ -36,6 +40,8 @@ pub trait Segment {
 ```
 
 #### Line
+
+A line defines a movement linearly between two points in the system.
 
 ```rust
 pub struct Line {
@@ -45,6 +51,8 @@ pub struct Line {
 ```
 
 #### Arc
+
+An arc defines a curve moving between a start and end point of a certain radius and drawn in a certain direction (clockwise or anticlockwise).
 
 ```rust
 pub struct Arc {
@@ -57,11 +65,13 @@ pub struct Arc {
 
 #### ToolPath
 
+A toolpath wraps a series of connected segments together into a logical grouping in which a travel move can be performed to the starting point and then cutting moves can be performed one after another for each segment in order.
+
 ```rust
 pub struct ToolPath {
     pub start: Point,
     pub end: Point,
-    pub points: Vec<Point>,
+    pub segments: Vec<Box<dyn Segment>>,
 }
 ```
 
